@@ -21,6 +21,9 @@ class Controller extends BaseController
 		$this->data['controller'] = strtolower($controller);
 		if(Session::has('logged_in_user')) {
 			$this->data['user'] = Session::get('user');
+			$this->data['logged_in_user'] = true;
+		} else {
+			$this->data['logged_in_user'] = false;
 		}
 	}
 }

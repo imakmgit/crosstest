@@ -1,4 +1,13 @@
 <?php
+/**
+ * File contains DashboardController class to handle NewsStand dashboard related requests
+ *
+ * @category Controller
+ * @package  NewsStand
+ * @author   Abani Meher <abanimeher@gmail.com>
+ * @license  Copyright
+ * @link     
+ */
 
 namespace App\Http\Controllers\News;
 
@@ -10,19 +19,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
+/**
+ * Controller class to handle NewsStand dashbaord related requests
+ *
+ * @extends  Controller
+ * @category NewsStand
+ * @package  Product
+ * @author   Abani Meher <abanimeher@gmail.com>
+ * @license  COPYRIGHT
+ * @link     
+ */
 class DashboardController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Registration & Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users, as well as the
-    | authentication of existing users. By default, this controller uses
-    | a simple trait to add these behaviors. Why don't you explore it?
-    |
-    */
-
     /**
      * Create a new dashboard controller instance.
      *
@@ -33,6 +41,11 @@ class DashboardController extends Controller
 		parent::__construct();
     }
     
+    /**
+     * Show user dashboard to add new and see last 5 published news
+     *
+     * @return object
+     */
     public function index() 
     {
 		//collect last 5 news posted by user
@@ -41,11 +54,11 @@ class DashboardController extends Controller
 		$this->data['latest_news'] = $news;
 		
 		//set data in view
-		$this->data['news_error'] = Session::has('news_error') ? Session::get('news_error') : false;
-		$this->data['news_message'] = Session::has('news_message') ? Session::get('news_message') : false;
-		$this->data['form_data'] = Session::has('form_data') ? Session::get('form_data') : false;
+		$this->data['news_error'] = Session::get('news_error', false);
+		$this->data['news_message'] = Session::get('news_message', false);
+		$this->data['form_data'] = Session::get('form_data', false);
 		$this->data['message'] = $this->data['news_error'] ? $this->data['news_error']['message'] : false;
-		
+
  		//remove data from session
 		Session::forget('news_error');
 		Session::forget('news_message');

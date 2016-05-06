@@ -6,6 +6,6 @@ function show_message(type, message, size, duration) {
 		duration: typeof(duration) == 'undefined' ? '10000' : duration
 	})
 }
-if(growl_notification) {
+if(typeof growl_notification != 'undefined' && growl_notification) {
 	show_message(growl_notification.error ? 'error' : 'notice', growl_notification.message);
 }

@@ -19,8 +19,5 @@
 	<div class="col-md-12 news-content" >
 		<p>{!! str_replace("\n", '</p><p>', $news[0]['content']) !!}</p>
 	</div>
-	<div class="pull-right">
-		<a href="/pdf{{ $news[0]['url'] }}">Save as PDF</a>
-	</div>
 </div>
 @endsection

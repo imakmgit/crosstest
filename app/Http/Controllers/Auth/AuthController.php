@@ -1,4 +1,13 @@
 <?php
+/**
+ * File contains AuthController class to handle authentication related requests
+ *
+ * @category Controller
+ * @package  NewsStand
+ * @author   Abani Meher <abanimeher@gmail.com>
+ * @license  Copyright
+ * @link     
+ */
 
 namespace App\Http\Controllers\Auth;
 
@@ -7,31 +16,19 @@ use App\Models\PasswordReset;
 use Validator, Crypt, Session, Hash, Mail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
-use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
+/**
+ * Controller class to handle authentication related requests
+ *
+ * @extends  Controller
+ * @category NewsStand
+ * @package  Product
+ * @author   Abani Meher <abanimeher@gmail.com>
+ * @license  COPYRIGHT
+ * @link     
+ */
 class AuthController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Registration & Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users, as well as the
-    | authentication of existing users. By default, this controller uses
-    | a simple trait to add these behaviors. Why don't you explore it?
-    |
-    */
-
-    use AuthenticatesAndRegistersUsers, ThrottlesLogins;
-
-    /**
-     * Where to redirect users after login / registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/';
-
     /**
      * Create a new authentication controller instance.
      *
@@ -43,20 +40,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Get a validator for an incoming registration request.
+     * Handles signup request
      *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @param object $request
+     * 
+     * @return void
      */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
-    }
-
     public function signup(Request $request) {
 
 		//get required data from form post
@@ -99,6 +88,7 @@ class AuthController extends Controller
 			]);
 			
 			$verification_url = url('/auth/verify_account?token=' . $token);
+			
 			//send verification email
 			Mail::send('emails.signup', [
 					'user' => $user, 'url' => $verification_url
@@ -121,14 +111,30 @@ class AuthController extends Controller
 		}
 	}
 
+    /**
+     * Shows login page
+     *
+     * @return object
+     */
     public function login() {
+		
+		//load login view
 		return view('auth.login', $this->data);
 	}
 	
+    /**
+     * Verifies account after verification  link is clicked in sign up confirmation mail
+     *
+     * @param object $request
+     * 
+     * @return object
+     */
 	public function verify_account(Request $request) {
 		
 		//get token from url
 		$token = $request->input('token');
+		
+		//get user info using token
 		$user = User::where('verification_token', $token)
 					->where('is_active', 0)->get();
 		
@@ -141,6 +147,7 @@ class AuthController extends Controller
 			$this->data['message'] = 'Something went wrong. Please contact our support team.';
 		} else {
 			
+			//set session and redirect to change password page
 			Session::put('is_password_set', true);
 			Session::put('is_password_reset', false);
 			Session::put('user', $user->toArray());
@@ -150,6 +157,13 @@ class AuthController extends Controller
 		return view('errors.message', $this->data);
 	}
 	
+    /**
+     * Verifies reset passsword request 
+     *
+     * @param object $request
+     * 
+     * @return object
+     */
 	public function verify_reset_password(Request $request) {
 		
 		//get token from url
@@ -165,9 +179,11 @@ class AuthController extends Controller
 			$this->data['message'] = 'Something went wrong. Please contact our support team.';
 		} else {
 			
+			//get user info
 			$user = User::where('id', $reset_request[0]->user_id)
 						->where('is_active', 1)->get()->toArray();
-
+			
+			//set data in session and redirect to change password page
 			Session::put('is_password_reset', true);
 			Session::put('is_password_set', false);
 			Session::put('user', $user);
@@ -177,11 +193,18 @@ class AuthController extends Controller
 		return view('errors.message', $this->data);
 	}
 	
-	public function change_password(Request $request) {
-
+    /**
+     * shows change password page
+     *
+     * @return object
+     */
+	public function change_password() {
+		
+		//if required data is not found, show error message
 		if(!Session::has('is_password_set') || 
 			!Session::has('is_password_reset') ||
 			!Session::has('user')) {
+
 			$this->data['message'] = 'Invalid URL.';	
 			return view('errors.message', $this->data);
 		}
@@ -195,18 +218,31 @@ class AuthController extends Controller
 		return view('auth.change_password', $this->data);
 	}
 
+    /**
+     * updates password of user
+     *
+     * @param object $request
+     * 
+     * @return object
+     */
 	public function update_password(Request $request) {
 		
+		//get all field data from request
 		$data = $request->all();
+		
+		//ser default response
 		$response = array(
 			'error' => false,
 			'message' => ''
 		);
+		
+		//validate password field
 		if(strlen($data['password']) < 8) {
 			$response['error'] = true;
 			$response['message']['password'][] = 'Password must be of minimum 8 characters length.';
 		}
 		
+		//validate confirm password field
 		if(strlen($data['confirm_password']) < 8) {
 			$response['error'] = true;
 			$response['message']['confirm_password'][] = 'Confirm password must be of minimum 8 characters length.';
@@ -220,8 +256,10 @@ class AuthController extends Controller
 		//check if user is logged in
 		if(Session::has('logged_in_user')) {
 			
+			//get user info from database
 			$user = User::find(Session::get('user.0.id'))->toArray();
-
+			
+			//check with current password of user
 			if(!Hash::check($data['current_password'], $user['password'])) {
 				
 				$response['error'] = true;
@@ -229,6 +267,7 @@ class AuthController extends Controller
 			}
 		}
 		
+		//in case of error, return response
 		if($response['error']) {
 			
 			return response()->json($response);
@@ -243,6 +282,7 @@ class AuthController extends Controller
 		$user->verification_ip_address = $request->ip();
 		$user->save();
 		
+		//set no error response and message
 		$response['error'] = false;
 		$response['message'] = 'Password updated successfully. You will be redirected.';
 
@@ -252,20 +292,35 @@ class AuthController extends Controller
 		return response()->json($response);
 	}
 	
-	public function validate_login(Request $request) {
-		
+    /**
+     * validates user login
+     *
+     * @param object $request
+     * 
+     * @return object
+     */
+	public function validate_login(Request $request) 
+	{
+		//get email and password from request
 		$email = $request->input('email');
 		$password = $request->input('password');
 		
+		//get user usingemail
 		$user = User::where('email', $email)
 					->where('is_active', 1)
 					->get()->toArray();
-					
+		
+		//if user is founf
 		if(count($user)) {
 			
+			//check password saved in database with provided by user
 			if(Hash::check($password, $user[0]['password'])) {
+				
+				//set session to indicate valid login
 				Session::put('user', $user);
 				Session::put('logged_in_user', true);
+				
+				//return response
 				return  response()->json(
 					array(
 						'error' => false,
@@ -273,7 +328,8 @@ class AuthController extends Controller
 					)
 				);
 			} else {
-					
+				
+				//return error response
 				return  response()->json(
 					array(
 						'error' => true,
@@ -282,6 +338,7 @@ class AuthController extends Controller
 				);
 			}
 		} else {
+			
 			return  response()->json(
 				array(
 					'error' => true,
@@ -291,13 +348,22 @@ class AuthController extends Controller
 		}
 	}
 	
+	/**
+     * shows forgot password page and process forgot password request
+     *
+     * @param object $request
+     * 
+     * @return object
+     */
 	function forgot_password(Request $request) {
 		
+		//if method is post, process request to update password
 		if ($request->isMethod('post')) {
 
 			//check email exists in database
 			$user = User::where('email', $request->input('email'))->get()->toArray();
 			
+			//if user exists, create a token and send it in email to user
 			if(count($user)) {
 				
 				$password_reset = new PasswordReset();
@@ -307,6 +373,7 @@ class AuthController extends Controller
 				$password_reset->save();
 				
 				$verification_url = url('/auth/verify_reset_password?token=' . $password_reset->token);
+
 				//send verification email
 				Mail::send('emails.password_reset', [
 						'user' => $user, 'url' => $verification_url, 'ip' => $request->ip()
@@ -331,9 +398,18 @@ class AuthController extends Controller
 		}
 	}
 
+    /**
+     * Logout user from session and show login page
+     *
+     * @return object
+     */
 	function logout() {
+		
+		//delete login related data
 		Session::forget('logged_in_user');
 		Session::forget('user');
+		
+		//redirect to login page
 		return redirect('auth/login');
 	}
 }

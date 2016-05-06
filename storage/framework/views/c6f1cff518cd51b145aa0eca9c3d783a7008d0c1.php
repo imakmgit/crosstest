@@ -18,9 +18,6 @@
 	<div class="col-md-12 news-content" >
 		<p><?php echo str_replace("\n", '</p><p>', $news[0]['content']); ?></p>
 	</div>
-	<div class="pull-right">
-		<a href="/pdf<?php echo e($news[0]['url']); ?>">Save as PDF</a>
-	</div>
 </div>
 <?php $__env->stopSection(); ?>
 

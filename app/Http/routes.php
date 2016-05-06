@@ -27,5 +27,7 @@ Route::get('/pdf/news/{year}/{month}/{date}/{user}/{title}/{token?}', 'News\News
 //all authenticated requests
 Route::group(['middleware' => array('auth')], function() {
 	Route::get('/dashboard', 'News\DashboardController@index');
+	Route::get('/dashboard/news', 'News\NewsController@news_list');
 	Route::post('/news/create', 'News\NewsController@create');
+	Route::get('/news/delete/{id}', 'News\NewsController@delete');
 });

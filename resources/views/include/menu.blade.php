@@ -11,6 +11,15 @@
 	</div>
 	<div id="navbar" class="navbar-collapse collapse">
 	  <ul class="nav navbar-nav navbar-right">
+		@if(!empty($user))
+
+		  <li>
+			<a href="/dashboard">Publish a News</a>
+		  </li>
+		  <li>
+			<a href="/dashboard/news">My Published News</a>
+		  </li>
+		 @endif
 		<li class="dropdown">
 			@if(!empty($user))
 			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -20,7 +29,6 @@
 			<a href="/auth/login">Login</a>
 			@endif
 			<ul class="dropdown-menu">
-				<li><a href="/news/list">Published News</a></li>
 				<li><a href="/auth/logout">Logout</a></li>
 			</ul>
 		</li>
