@@ -17,6 +17,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Suin\RSSWriter\Channel;
+use Suin\RSSWriter\Feed;
+use Suin\RSSWriter\Item;
 
 /**
  * Controller class to handle NewsStand news related requests
@@ -267,5 +270,49 @@ class NewsController extends Controller
 		}
 		
 		return response()->json($response);
+	}
+	
+    /**
+     * Shows rss feed of latest 10 news
+     * 
+     * @return object
+     */
+	public function rss()
+	{
+		$feed = new Feed();
+
+		$channel = new Channel();
+		$channel
+			->title('NewsStand')
+			->description('NewsStand provides latest news.')
+			->url('http://www.newsstand.com')
+			->language('en-US')
+			->copyright('Copyright 2016, NewsStand')
+			->pubDate(time())
+			->lastBuildDate(time())
+			->ttl(60)
+			->appendTo($feed);
+
+		//get last 10 published news
+		$news = News::with('newsCreator')->orderBy('id', 'desc')
+					->take(10)->get()->toArray();
+		
+		if(count($news)) {
+
+			foreach($news as $news_item) {
+				$item = new Item();
+				$item
+					->title($news_item['title'])
+					->description($news_item['content'])
+					->contentEncoded('<div><p>' . str_replace("\n", '</p><p>', $news_item['content']) . '</p></div>')
+					->url(url($news_item['url']))
+					->author($news_item['news_creator']['name'])
+					->pubDate(strtotime($news_item['created_at']))
+					->guid(url($news_item['url']), true)
+					->appendTo($channel);
+			}
+		}
+		echo $feed; // or echo $feed->render();
+		
 	}
 }

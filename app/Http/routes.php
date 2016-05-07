@@ -23,6 +23,7 @@ Route::post('/auth/update_password', 'Auth\AuthController@update_password');
 Route::get('/', 'News\NewsController@index');
 Route::get('/news/{year}/{month}/{date}/{user}/{title}/{token?}', 'News\NewsController@show');
 Route::get('/pdf/news/{year}/{month}/{date}/{user}/{title}/{token?}', 'News\NewsController@pdf');
+Route::get('/rss/', 'News\NewsController@rss');
 
 //all authenticated requests
 Route::group(['middleware' => array('auth')], function() {

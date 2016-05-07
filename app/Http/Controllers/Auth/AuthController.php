@@ -46,7 +46,8 @@ class AuthController extends Controller
      * 
      * @return void
      */
-    public function signup(Request $request) {
+    public function signup(Request $request) 
+    {
 
 		//get required data from form post
 		$data = array(
@@ -116,7 +117,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function login() {
+    public function login() 
+    {
 		
 		//load login view
 		return view('auth.login', $this->data);
@@ -129,7 +131,8 @@ class AuthController extends Controller
      * 
      * @return object
      */
-	public function verify_account(Request $request) {
+	public function verify_account(Request $request) 
+	{
 		
 		//get token from url
 		$token = $request->input('token');
@@ -164,7 +167,8 @@ class AuthController extends Controller
      * 
      * @return object
      */
-	public function verify_reset_password(Request $request) {
+	public function verify_reset_password(Request $request) 
+	{
 		
 		//get token from url
 		$token = $request->input('token');
@@ -198,7 +202,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-	public function change_password() {
+	public function change_password() 
+	{
 		
 		//if required data is not found, show error message
 		if(!Session::has('is_password_set') || 
@@ -225,7 +230,8 @@ class AuthController extends Controller
      * 
      * @return object
      */
-	public function update_password(Request $request) {
+	public function update_password(Request $request) 
+	{
 		
 		//get all field data from request
 		$data = $request->all();
@@ -355,7 +361,8 @@ class AuthController extends Controller
      * 
      * @return object
      */
-	function forgot_password(Request $request) {
+	function forgot_password(Request $request) 
+	{
 		
 		//if method is post, process request to update password
 		if ($request->isMethod('post')) {
@@ -403,7 +410,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-	function logout() {
+	function logout() 
+	{
 		
 		//delete login related data
 		Session::forget('logged_in_user');
